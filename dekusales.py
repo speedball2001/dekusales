@@ -1,6 +1,7 @@
 from lxml import html
 from pathlib import Path
 from string import Template
+from urllib import parse
 
 import argparse
 import requests
@@ -8,7 +9,20 @@ import sys
 import os
 
 def process_url(url_string, deku_game_id):
-    digital_format_url = url_string + '?format=digital'
+    parsed_url = parse.urlsplit(url_string)
+    query = parsed_url.query
+
+    if len(parsed_url.query) > 0:
+        query = parsed_url.query + '&format=digital'
+    else:
+        query = 'format=digital'
+
+
+    digital_format_url = parse.urlunsplit(parse.SplitResult(parsed_url.scheme,
+                                                            parsed_url.netloc,
+                                                            parsed_url.path,
+                                                            query,
+                                                            parsed_url.fragment))
     r = requests.get(digital_format_url)
 
     game_information = {}
@@ -123,12 +137,15 @@ def main():
     with open(args.input_file, 'r') as f:
         for url_string in f:
             url_string = url_string.strip()
+
             #
             # Die URL hat die Form
             #   https://www.dekudeals.com/items/katana-zero
             #
             # Wir brauchen den Teilstring 'katana-zero'
-            deku_game_id = url_string.rpartition('/')[2]
+
+            parsed_url = parse.urlsplit(url_string)
+            deku_game_id = parsed_url.path.rpartition('/')[2]
             print("Verarbeite " + deku_game_id)
 
             game_information = process_url(url_string, deku_game_id)
