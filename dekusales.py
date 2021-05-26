@@ -76,6 +76,16 @@ def process_url(url_string, deku_game_id):
         sales_end_date = pricing_table.xpath('tr/td/a[contains(text(), "Sale")]/text()')
         if len(sales_end_date) > 0:
             sales_end_date = sales_end_date[0].strip()
+
+            #
+            # Enddatum hat die Form "Sale ends June 10"
+            # Wir formatieren es leicht um in "10 June"
+            #
+            sales_end_date_parts = sales_end_date.split()
+
+            if(len(sales_end_date_parts) == 4):
+                sales_end_date = sales_end_date_parts[3] + ' ' + sales_end_date_parts[2]
+
         else:
             sales_end_date = None
 
