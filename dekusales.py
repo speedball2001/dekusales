@@ -4,6 +4,7 @@ from string import Template
 from urllib import parse
 
 import argparse
+import re
 import requests
 import sys
 import os
@@ -137,6 +138,18 @@ def main():
     with open(args.input_file, 'r') as f:
         for url_string in f:
             url_string = url_string.strip()
+
+            #
+            # Ignoriere Kommentare
+            #
+            if(url_string.startswith("#")):
+                continue
+
+            #
+            # Ignoriere Leerzeilen bzw. Zeilen, die nur Whitespace enthalten
+            #
+            if(len(re.sub(r"\s+", "", url_string, flags=re.UNICODE)) == 0):
+                continue
 
             #
             # Die URL hat die Form
